@@ -2,14 +2,35 @@
 #include <stdlib.h>
 #include "contiki-net.h"
 static struct psock ps;
-static unsigned int *buffer;
-  static
-PT_THREAD(handle_connection(struct psock *p))
+static char buffer[10];
+
+char * respondWithUpper(struct psock *p){
+  char *newstr = malloc(PSOCK_DATALEN(p));
+  char *stringBuffer = *(char*)buffer;
+  int i = 0;
+  for(i = 0; i < PSOCK_DATALEN(p) ; i++){
+    if(buffer[i] != '\n'){
+      newstr[i] = toupper(buffer[i]);
+    }else{
+      newstr[i] = toupper(buffer[i]);
+    }
+  }
+  return newstr;
+}
+
+static PT_THREAD(handle_connection(struct psock *p))
 {
   PSOCK_BEGIN(p);
-  PSOCK_SEND(p,0,sizeof(int));
-  printf("[Server] - send 0\n");
-  PSOCK_READBUF_LEN(p,sizeof(uint8_t));
+  int *n;
+  int m = 1;
+  n = &m;
+  //PSOCK_SEND_STR(p, "hello client\n");
+  PSOCK_SEND(p,n,sizeof(n));
+  //PSOCK_READTO(p, '\n');
+  //char *newstr = respondWithUpper(p);
+  //PSOCK_SEND(p, newstr, PSOCK_DATALEN(p));
+  //PSOCK_SEND(p,"Good bye!\r\n",11);
+  //PSOCK_SEND_STR(p, "Good bye!\r\n");
   PSOCK_CLOSE(p);
   PSOCK_END(p);
 }
